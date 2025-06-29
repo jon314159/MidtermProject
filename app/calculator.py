@@ -1,9 +1,18 @@
+"""
+Command-line interface for the calculator.
+
+Implements a Read-Eval-Print Loop (REPL) that continuously prompts the user
+for commands, processes arithmetic operations, and manages calculation history.
+"""
+
 import sys
 import readline  # Enables command history and editing features
 from typing import List
 from app.calculation import Calculation, CalculationFactory
 from app.logger import LoggingObserver
 from app.autosave import AutoSaveObserver
+import app.calculation_operations  # Ensures all @register_calculation decorators run
+
 
 
 def display_help():
@@ -25,16 +34,16 @@ def parse_command(command: str) -> List[str]:
     Parse the command input into a list of arguments.
 
     :param command: The command string to parse.
+    :type command: str
     :return: A list of command arguments.
+    :rtype: List[str]
     """
     return command.strip().split()
 
 
 def display_history(history: List[Calculation]) -> None:
     """
-    Display the command history using readline module.
-
-    :param history: List of Calculation objects (not used directly here).
+    Display the command history.
     """
     print("Command History:")
     for i, cmd in enumerate(
@@ -87,8 +96,8 @@ def calculator() -> None:
                     for observer in observers:
                         observer.update(calc)
 
-                except ValueError:
-                    print("Invalid numbers provided.")
+                except ValueError as ve:
+                    print(f"[ValueError] {ve}")
                     continue
                 except Exception as e:
                     print(f"An error occurred: {e}")
