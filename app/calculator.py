@@ -1,0 +1,79 @@
+import sys
+import readline  # Enables command history and editing features
+from typing import List
+from app.calculation import calculation, CalculationFactory
+
+def display_help():
+    """
+    Display the help message for the calculator.
+    """
+    print("Welcome to the Calculator!")
+    print("Available commands:")
+    print("  add <a> <b>       - Add two numbers")
+    print("  subtract <a> <b>  - Subtract second number from first")
+    print("  multiply <a> <b>  - Multiply two numbers")
+    print("  divide <a> <b>    - Divide first number by second (cannot divide by zero)")
+    print("  help              - Display this help message")
+    print("  exit              - Exit the calculator")
+def parse_command(command: str) -> List[str]:
+    """
+    Parse the command input into a list of arguments.
+
+    :param command: The command string to parse.
+    :type command: str  
+    :return: A list of command arguments.
+    :rtype: List[str]
+    """
+    return command.strip().split()
+def display_history(history: List[calculation]) -> None:
+    """
+    Display the command history.
+    """
+    print("Command History:")
+    for i, cmd in enumerate(readline.get_history_item(i) for i in range(1, readline.get_current_history_length() + 1)):
+        print(f"{i}: {cmd}")
+        
+def calculator() -> None:
+    """     
+    Execute the command based on the parsed input. 
+    :param command: The parsed command arguments.
+    :type command: List[str]
+    """
+    history: List[calculation] = []
+    while True:
+        try:
+            userinput: str = input("Enter command (or 'help' for options): ")
+            if not userinput.strip():
+                continue
+            cmd = cmd[0].lower()
+            if not cmd:
+                continue  # pragma: no cover
+            if cmd == "help":
+                display_help()
+            elif cmd == "exit":
+                print("Exiting the calculator. Goodbye!")
+                sys.exit(0)
+            elif cmd in ["add", "subtract", "multiply", "divide"]:
+                if len(cmd) != 3:
+                    print(f"Usage: {cmd} <a> <b>")
+                    return
+                try:
+                    a = float(cmd[1])
+                    b = float(cmd[2])
+                except ValueError:
+                    print("Invalid numbers provided.")
+                    continue #pragma: no cover
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+                    continue
+                return
+        except KeyboardInterrupt:
+            print("\nExiting the calculator. Goodbye!")
+            sys.exit(0)
+        except EOFError:
+            print("\nExiting the calculator. Goodbye!")
+            sys.exit(0)
+
+
+if __name__ == "__main__":
+    calculator()
