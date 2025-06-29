@@ -1,2 +1,2 @@
 operation,operand1,operand2,result
-add,1.0,1.0,2.0
+MagicMock,<MagicMock name='create_calculation().a' id='140377337393760'>,<MagicMock name='create_calculation().b' id='140377374909616'>,5

@@ -154,3 +154,24 @@ def test_integer_division_negative():
     a = -5
     b = -2
     assert operations.integer_division(a, b) == 2, "Integer division failed"
+
+def test_square_root_negative():
+    """
+    Test that square root of a negative number raises a ValueError.
+    """
+    with pytest.raises(ValueError, match="Cannot compute square root of a negative number"):
+        operations.square_root(-9)
+
+def test_divide_by_zero():
+    """
+    Test that dividing by zero raises a ValueError.
+    """
+    with pytest.raises(ValueError, match="Cannot divide by zero"):
+        operations.divide(10, 0)
+
+def test_integer_division_by_zero():
+    """
+    Test that dividing by zero raises a ValueError.
+    """
+    with pytest.raises(ValueError, match="Cannot divide by zero"):
+        operations.integer_division(5, 0)

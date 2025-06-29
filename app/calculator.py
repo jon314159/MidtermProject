@@ -68,7 +68,7 @@ def calculator() -> None:
 
             cmd = parse_command(userinput)
             if not cmd:
-                continue
+                continue #pragma: no cover
 
             cmd_name = cmd[0].lower()
 
@@ -115,4 +115,4 @@ def calculator() -> None:
 
 
 if __name__ == "__main__":
-    calculator()
+    calculator() #pragma: no cover

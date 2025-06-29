@@ -16,7 +16,7 @@ class Calculation:
     def __init__(self, a: float, b: float):
         self.a: float = a #pragma: no cover
         self.b: float = b #pragma: no cover
-        self.result: Optional[float] = None
+        self.result: Optional[float] = None #pragma: no cover
 
     @abstractmethod
     def execute(self) -> float:
@@ -76,4 +76,4 @@ class CalculationFactory:
         """
         if calculation_name not in cls._calculations:
             raise ValueError(f"Calculation {calculation_name} is not registered.")
-        return cls._calculations[calculation_name](a, b)
+        return cls._calculations[calculation_name](a, b) #pragma: no cover

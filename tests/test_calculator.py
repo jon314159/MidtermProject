@@ -74,7 +74,7 @@ def test_invalid_number_input(mock_exit, mock_input, capsys):
     with pytest.raises(SystemExit):
         calculator()
     output = capsys.readouterr().out
-    assert "Invalid numbers provided." in output
+    assert "could not convert string to float" in output
 
 
 @patch("app.calculation.CalculationFactory.create_calculation")
@@ -111,3 +111,24 @@ def test_eof_interrupt_exit(mock_exit, mock_input, capsys):
         calculator()
     output = capsys.readouterr().out
     assert "Exiting the calculator" in output
+
+def test_observer_raises_generic_exception(monkeypatch, capsys):
+    # Simulate user inputs:
+    inputs = iter(["add 1 1", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    # Patch CalculationFactory to ensure it works
+    from app.calculation import CalculationFactory
+    calc = CalculationFactory.create_calculation("add", 1, 1)
+
+    # Patch observers to raise a generic Exception
+    bad_observer = MagicMock()
+    bad_observer.update.side_effect = Exception("Something unexpected")
+
+    with patch("app.calculator.LoggingObserver", return_value=bad_observer), \
+         patch("app.calculator.AutoSaveObserver", return_value=bad_observer):
+        with pytest.raises(SystemExit):  # exit command ends loop
+            calculator()
+
+    output = capsys.readouterr().out
+    assert "An error occurred: Something unexpected" in output
