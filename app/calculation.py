@@ -68,4 +68,12 @@ class percentage(calculation):
 @CalculationFactory.register_calculation
 class absolute_difference(calculation):
     def execute(self) -> float:
-        return operations.absolute_difference(self.a, self.b)            
+        return operations.absolute_difference(self.a, self.b)       
+@CalculationFactory.register_calculation
+class square_root(calculation):
+    def execute(self) -> float:
+        return operations.square_root(self.a)
+@CalculationFactory.register_calculation
+class integer_division(calculation):
+    def execute(self) -> float:
+        return operations.integer_division(int(self.a), int(self.b))     

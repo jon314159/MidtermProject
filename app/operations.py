@@ -34,3 +34,16 @@ class operations:
     def absolute_difference(a: float, b: float) -> float:
         return abs(a - b)
     
+    @staticmethod
+    def square_root(a: float) -> float:
+        if a < 0:
+            raise ValueError("Cannot compute square root of a negative number")
+        return a ** 0.5
+    
+    @staticmethod
+    def integer_division(a: int, b: int) -> int:
+        if b == 0:
+            raise ValueError("Cannot divide by zero")
+        return a // b
+    
+    

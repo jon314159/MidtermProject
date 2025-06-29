@@ -85,3 +85,18 @@ def test_absolute_difference_negative():
     a = -10
     b = -5
     assert operations.absolute_difference(a, b) == 5, "Absolute difference failed"
+
+def test_square_root_positive():
+    a = 16
+    assert operations.square_root(a) == 4, "Square root operation failed"
+
+def integar_division_positive():
+    a = 5
+    b = 2
+    assert operations.integer_division(a, b) == 2, "Integer division failed"
+
+def integer_division_negative():
+    a = -5
+    b = -2
+    assert operations.integer_division(a, b) == 2, "Integer division failed"
+
