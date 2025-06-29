@@ -1,8 +1,10 @@
-import cmd
 import sys
 import readline  # Enables command history and editing features
 from typing import List
-from app.calculation import calculation, CalculationFactory
+from app.calculation import Calculation, CalculationFactory
+from app.logger import LoggingObserver
+from app.autosave import AutoSaveObserver
+
 
 def display_help():
     """
@@ -16,30 +18,39 @@ def display_help():
     print("  divide <a> <b>    - Divide first number by second (cannot divide by zero)")
     print("  help              - Display this help message")
     print("  exit              - Exit the calculator")
+
+
 def parse_command(command: str) -> List[str]:
     """
     Parse the command input into a list of arguments.
 
     :param command: The command string to parse.
-    :type command: str  
     :return: A list of command arguments.
-    :rtype: List[str]
     """
     return command.strip().split()
-def display_history(history: List[calculation]) -> None:
+
+
+def display_history(history: List[Calculation]) -> None:
     """
-    Display the command history.
+    Display the command history using readline module.
+
+    :param history: List of Calculation objects (not used directly here).
     """
     print("Command History:")
-    for i, cmd in enumerate(readline.get_history_item(i) for i in range(1, readline.get_current_history_length() + 1)):
+    for i, cmd in enumerate(
+        readline.get_history_item(i) for i in range(1, readline.get_current_history_length() + 1)
+    ):
         print(f"{i}: {cmd}")
-        
+
+
 def calculator() -> None:
     """
     Main calculator loop.
     Accepts user commands and executes calculations or utility actions.
     """
-    history: List[calculation] = []
+    history: List[Calculation] = []
+    observers = [LoggingObserver(), AutoSaveObserver(history)]
+
     while True:
         try:
             userinput: str = input("Enter command (or 'help' for options): ")
@@ -69,8 +80,13 @@ def calculator() -> None:
                     b = float(cmd[2])
                     calc = CalculationFactory.create_calculation(cmd_name, a, b)
                     result = calc.execute()
+                    calc.result = result  # Attach result dynamically
                     print(f"Result: {result}")
                     history.append(calc)
+
+                    for observer in observers:
+                        observer.update(calc)
+
                 except ValueError:
                     print("Invalid numbers provided.")
                     continue
@@ -87,6 +103,7 @@ def calculator() -> None:
         except EOFError:
             print("\nExiting the calculator. Goodbye!")
             sys.exit(0)
+
 
 if __name__ == "__main__":
     calculator()
