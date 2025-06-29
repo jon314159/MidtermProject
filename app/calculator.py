@@ -1,3 +1,4 @@
+import cmd
 import sys
 import readline  # Enables command history and editing features
 from typing import List
@@ -34,10 +35,9 @@ def display_history(history: List[calculation]) -> None:
         print(f"{i}: {cmd}")
         
 def calculator() -> None:
-    """     
-    Execute the command based on the parsed input. 
-    :param command: The parsed command arguments.
-    :type command: List[str]
+    """
+    Main calculator loop.
+    Accepts user commands and executes calculations or utility actions.
     """
     history: List[calculation] = []
     while True:
@@ -45,35 +45,48 @@ def calculator() -> None:
             userinput: str = input("Enter command (or 'help' for options): ")
             if not userinput.strip():
                 continue
-            cmd = cmd[0].lower()
+
+            cmd = parse_command(userinput)
             if not cmd:
-                continue  # pragma: no cover
-            if cmd == "help":
+                continue
+
+            cmd_name = cmd[0].lower()
+
+            if cmd_name == "help":
                 display_help()
-            elif cmd == "exit":
+
+            elif cmd_name == "exit":
                 print("Exiting the calculator. Goodbye!")
                 sys.exit(0)
-            elif cmd in ["add", "subtract", "multiply", "divide"]:
+
+            elif cmd_name in ["add", "subtract", "multiply", "divide"]:
                 if len(cmd) != 3:
-                    print(f"Usage: {cmd} <a> <b>")
-                    return
+                    print(f"Usage: {cmd_name} <a> <b>")
+                    continue
+
                 try:
                     a = float(cmd[1])
                     b = float(cmd[2])
+                    calc = CalculationFactory.create_calculation(cmd_name, a, b)
+                    result = calc.execute()
+                    print(f"Result: {result}")
+                    history.append(calc)
                 except ValueError:
                     print("Invalid numbers provided.")
-                    continue #pragma: no cover
+                    continue
                 except Exception as e:
                     print(f"An error occurred: {e}")
                     continue
-                return
+
+            else:
+                print(f"Unknown command: {cmd_name}")
+
         except KeyboardInterrupt:
             print("\nExiting the calculator. Goodbye!")
             sys.exit(0)
         except EOFError:
             print("\nExiting the calculator. Goodbye!")
             sys.exit(0)
-
 
 if __name__ == "__main__":
     calculator()

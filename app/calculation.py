@@ -61,3 +61,17 @@ class CalculationFactory:
             cls.register_calculation(cls)
             if cls.__name__ not in cls._calculations:
                 cls._calculations[cls.__name__] = cls
+    @classmethod
+    def create_calculation(cls, calculation_name: str, a: float, b: float) -> calculation:
+        """
+        Create a registered calculation instance.
+
+        :param calculation_name: Name of the registered class.
+        :param a: First operand.
+        :param b: Second operand.
+        :return: Instance of a subclass of calculation.
+        :raises ValueError: If calculation_name is not registered.
+        """
+        if calculation_name not in cls._calculations:
+            raise ValueError(f"Calculation {calculation_name} is not registered.")
+        return cls._calculations[calculation_name](a, b)
