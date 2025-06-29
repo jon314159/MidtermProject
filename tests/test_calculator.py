@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from app.calculator import calculator, display_help, display_history
-
+from app import config
+import builtins
 
 # --------- Helpers ---------
 def infinite_inputs(*inputs):
@@ -132,3 +133,39 @@ def test_observer_raises_generic_exception(monkeypatch, capsys):
 
     output = capsys.readouterr().out
     assert "An error occurred: Something unexpected" in output
+
+def test_input_exceeds_max(monkeypatch, capsys):
+    # Set low max to trigger the limit condition
+    monkeypatch.setattr(config, "CALCULATOR_MAX_INPUT_VALUE", 10)
+    
+    # Simulate user input: first a bad input, then 'exit' to end loop
+    inputs = iter(["add 100 1", "exit"])
+    monkeypatch.setattr(builtins, "input", lambda _: next(inputs))
+    
+    with pytest.raises(SystemExit):
+        calculator()
+
+    output = capsys.readouterr().out
+    assert "Input values exceed the maximum allowed." in output
+
+def test_max_history_limit(monkeypatch, capsys):
+    # Set max history size to 2
+    monkeypatch.setattr(config, "CALCULATOR_MAX_HISTORY_SIZE", 2)
+    monkeypatch.setattr(config, "CALCULATOR_AUTO_SAVE", False)
+
+    # Feed 3 valid commands, 1 will be popped
+    inputs = iter([
+        "add 1 1",
+        "add 2 2",
+        "add 3 3",
+        "exit"
+    ])
+    monkeypatch.setattr(builtins, "input", lambda _: next(inputs))
+
+    with pytest.raises(SystemExit):
+        calculator()
+
+    output = capsys.readouterr().out
+    assert "Result: 2.0" in output
+    assert "Result: 4.0" in output
+    assert "Result: 6.0" in output

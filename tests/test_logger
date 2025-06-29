@@ -1,0 +1,26 @@
+from unittest.mock import MagicMock, patch
+from app.logger import LoggingObserver
+from app.calculation import Calculation
+
+
+def test_logging_observer_update_logs_message():
+    # Mock the logger returned by getLogger
+    mock_logger = MagicMock()
+    with patch("app.logger.logging.getLogger", return_value=mock_logger):
+        observer = LoggingObserver(log_file="test.log")
+
+        # Create a dummy Calculation object
+        dummy_calc = MagicMock(spec=Calculation)
+        dummy_calc.a = 10
+        dummy_calc.b = 5
+        dummy_calc.result = 15
+        dummy_calc.__class__.__name__ = "add"
+
+        # Call the update method
+        observer.update(dummy_calc)
+
+        # Assert log message was correct
+        expected_message = "Calculation performed: add (10, 5) = 15"
+        mock_logger.info.assert_called_once_with(expected_message)
+
+

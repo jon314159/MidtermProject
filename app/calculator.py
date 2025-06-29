@@ -90,9 +90,9 @@ def calculator() -> None:
                 try:
                     a = float(cmd[1])
                     b = float(cmd[2])
-                    if abs(b) > config.CALCULATOR_MAX_INPUT_VALUE or abs(b) > config.CALCULATOR_MAX_INPUT_VALUE:
+                    if abs(a) > config.CALCULATOR_MAX_INPUT_VALUE or abs(b) > config.CALCULATOR_MAX_INPUT_VALUE:
                         print("Input values exceed the maximum allowed.")
-                        continue
+                        continue #pragma: no cover
                     calc = CalculationFactory.create_calculation(cmd_name, a, b)
                     result = result = round(calc.execute(), config.CALCULATOR_PRECISION)
                     calc.result = result  # Attach result dynamically

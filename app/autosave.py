@@ -4,13 +4,14 @@ from typing import List, Optional
 from app.calculation import Calculation
 from app.history import HistoryObserver
 from app import config
+from typing import Sequence
 
 class AutoSaveObserver(HistoryObserver):
     """
     Automatically saves the list of calculations to a CSV file.
     """
 
-    def __init__(self, history: List[Calculation], output_file: Optional[str] = None):
+    def __init__(self, history: Sequence[Calculation], output_file: Optional[str] = None):
         """
         Initialize the AutoSaveObserver.
 

@@ -1,0 +1,38 @@
+import os
+import pandas as pd
+import tempfile
+from typing import List
+from app.history import AutoSaveObserver, HistoryObserver
+from app.calculation import Calculation
+
+class DummyCalculation(Calculation):
+    def __init__(self):
+        self.a = 1.0
+        self.b = 2.0
+        self.result = 3.0
+
+class DummyObserver(HistoryObserver):
+    def update(self, calculation: Calculation) -> None:
+        super().update(calculation)  # This will raise NotImplementedError
+
+def test_history_observer_not_implemented():
+    observer = DummyObserver()
+    calc = DummyCalculation()
+    try:
+        observer.update(calc)
+        assert False, "Expected NotImplementedError"
+    except NotImplementedError:
+        pass
+
+def test_autosave_observer_saves_csv(tmp_path):
+    calc = DummyCalculation()
+    history: List[Calculation] = [calc]
+
+    output_file = tmp_path / "history.csv"
+    observer = AutoSaveObserver(history=history, output_file=str(output_file))
+    observer.update(calc)
+
+    assert output_file.exists()
+    df = pd.read_csv(output_file)
+    assert list(df.columns) == ["operation", "operand1", "operand2", "result"]
+    assert df.iloc[0]["result"] == 3.0
