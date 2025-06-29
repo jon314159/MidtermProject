@@ -3,77 +3,61 @@ from app.operations import operations
 
 
 class calculation:
-        def __init__(self, a: float, b: float):
-            self.a: float = a
-            self.b: float = b
+    """
+    Abstract base class for all calculator operations.
 
-        @abstractmethod
-        def execute(self) -> float:
-            pass
+    :param a: The first operand.
+    :type a: float
+    :param b: The second operand.
+    :type b: float
+    """
 
-        def string(self) -> str:
-            return f"{self.__class__.__name__}({self.a}, {self.b})"
-        
+    def __init__(self, a: float, b: float):
+        self.a: float = a
+        self.b: float = b
+
+    @abstractmethod
+    def execute(self) -> float:
+        """
+        Execute the calculation. Must be implemented by subclasses.
+
+        :return: The result of the operation.
+        :rtype: float
+        """
+        pass
+
+    def string(self) -> str:
+        """
+        Return a string representation of the calculation.
+
+        :return: A formatted string with the class name and operands.
+        :rtype: str
+        """
+        return f"{self.__class__.__name__}({self.a}, {self.b})"
+
+
 class CalculationFactory:
+    """
+    Factory class to register and create calculation objects.
+    """
 
     _calculations = {}
 
     @classmethod
     def register_calculation(cls, calculation_class):
+        """
+        Register a new calculation class in the factory.
+
+        :param calculation_class: The class to register.
+        :type calculation_class: type
+
+        :return: A decorator that ensures the class is registered only once.
+        :rtype: function
+        """
+
         cls._calculations[calculation_class.__name__] = calculation_class
 
         def decorator(cls):
             cls.register_calculation(cls)
             if cls.__name__ not in cls._calculations:
-                raise ValueError(f"Calculation class {cls.__name__} is not registered.")
-            if cls.__name__ in cls._calculations:
-                raise ValueError(f"Calculation class {cls.__name__} is already registered.")
-            return cls
-        return decorator
-    @classmethod
-    def create_calculation(cls, calculation_name: str, a: float, b: float) -> calculation:
-        if calculation_name not in cls._calculations:
-            raise ValueError(f"Calculation {calculation_name} is not registered.")
-        return cls._calculations[calculation_name](a, b)
-    
-    # Register the add calculation after CalculationFactory is defined
-@CalculationFactory.register_calculation
-class add(calculation):
-    def execute(self) -> float:
-        return operations.add(self.a, self.b)
-@CalculationFactory.register_calculation
-class subtract(calculation):
-    def execute(self) -> float:
-        return operations.subtract(self.a, self.b)
-@CalculationFactory.register_calculation
-class multiply(calculation):
-    def execute(self) -> float:
-        return operations.multiply(self.a, self.b)
-@CalculationFactory.register_calculation
-class divide(calculation):
-    def execute(self) -> float:
-        return operations.divide(self.a, self.b)
-@CalculationFactory.register_calculation
-class power(calculation):
-    def execute(self) -> float:
-        return operations.power(self.a, self.b)
-@CalculationFactory.register_calculation
-class modulus(calculation):
-    def execute(self) -> float:
-        return operations.modulus(self.a, self.b)
-@CalculationFactory.register_calculation
-class percentage(calculation):
-    def execute(self) -> float:
-        return operations.percentage(self.a, self.b)
-@CalculationFactory.register_calculation
-class absolute_difference(calculation):
-    def execute(self) -> float:
-        return operations.absolute_difference(self.a, self.b)       
-@CalculationFactory.register_calculation
-class square_root(calculation):
-    def execute(self) -> float:
-        return operations.square_root(self.a)
-@CalculationFactory.register_calculation
-class integer_division(calculation):
-    def execute(self) -> float:
-        return operations.integer_division(int(self.a), int(self.b))     
+                cls._calculations[cls.__name__] = cls
