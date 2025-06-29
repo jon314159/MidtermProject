@@ -11,8 +11,9 @@ from typing import List
 from app.calculation import Calculation, CalculationFactory
 from app.logger import LoggingObserver
 from app.autosave import AutoSaveObserver
+from app.history import HistoryObserver 
 import app.calculation_operations  # Ensures all @register_calculation decorators run
-
+import app.config as config
 
 
 def display_help():
@@ -58,7 +59,9 @@ def calculator() -> None:
     Accepts user commands and executes calculations or utility actions.
     """
     history: List[Calculation] = []
-    observers = [LoggingObserver(), AutoSaveObserver(history)]
+    observers: List[HistoryObserver] = [] 
+    if config.CALCULATOR_AUTO_SAVE:
+        observers.append(AutoSaveObserver(history))
 
     while True:
         try:
@@ -83,15 +86,21 @@ def calculator() -> None:
                 if len(cmd) != 3:
                     print(f"Usage: {cmd_name} <a> <b>")
                     continue
-
+                    
                 try:
                     a = float(cmd[1])
                     b = float(cmd[2])
+                    if abs(b) > config.CALCULATOR_MAX_INPUT_VALUE or abs(b) > config.CALCULATOR_MAX_INPUT_VALUE:
+                        print("Input values exceed the maximum allowed.")
+                        continue
                     calc = CalculationFactory.create_calculation(cmd_name, a, b)
-                    result = calc.execute()
+                    result = result = round(calc.execute(), config.CALCULATOR_PRECISION)
                     calc.result = result  # Attach result dynamically
                     print(f"Result: {result}")
                     history.append(calc)
+                    # Enforce max history size
+                    if len(history) > config.CALCULATOR_MAX_HISTORY_SIZE:
+                            history.pop(0)
 
                     for observer in observers:
                         observer.update(calc)
