@@ -26,6 +26,21 @@ def display_help():
     print("  subtract <a> <b>  - Subtract second number from first")
     print("  multiply <a> <b>  - Multiply two numbers")
     print("  divide <a> <b>    - Divide first number by second (cannot divide by zero)")
+    print("  power <a> <b>    - Raise first number to the power of second")
+    print("  root <a> <b>      - Calculate the b-th root of a")
+    print("  modulus <a> <b>    - Calculate the modulus of a by b")
+    print(" int_divide <a> <b>    - Calculate the integer division of a by b" \
+    "")
+    print("percent <a> <b>    - Calculate b percent of a" \
+    "")
+    print("abs_diff <a> <b>    - Calculate the absolute difference between a and b")
+    print(" history            - Show command history" \
+    "")
+    print("  undo              - Undo the last operation")
+    print("  redo              - Redo the last undone operation")
+    print("  clear             - Clear the command history")
+    print("  save              - Save the command history to a file")
+    print("  load              - Load command history from a file")
     print("  help              - Display this help message")
     print("  exit              - Exit the calculator")
 

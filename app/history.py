@@ -3,6 +3,7 @@ import pandas as pd
 from typing import List
 from app.calculation import Calculation
 from typing import Optional
+from app.exceptions import FileProcessingError
 # define HistoryObserver interface to avoid circular import
 class HistoryObserver:
     def update(self, calculation: Calculation) -> None:
@@ -36,12 +37,14 @@ class AutoSaveObserver(HistoryObserver):
 
         :param _: The most recent Calculation (not used directly).
         """
-        data = [{
-            "operation": c.__class__.__name__,
-            "operand1": c.a,
-            "operand2": c.b,
-            "result": c.result
-        } for c in self.history]
-
-        df = pd.DataFrame(data)
-        df.to_csv(self.output_file, index=False, encoding=config.CALCULATOR_DEFAULT_ENCODING)
+        try:
+            data = [{
+                "operation": c.__class__.__name__,
+                "operand1": c.a,
+                "operand2": c.b,
+                "result": c.result
+                } for c in self.history]
+            df = pd.DataFrame(data)
+            df.to_csv(self.output_file, index=False, encoding=config.CALCULATOR_DEFAULT_ENCODING)
+        except Exception as e:
+            raise FileProcessingError(f"Error saving history to {self.output_file}: {e}")
