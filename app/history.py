@@ -4,14 +4,12 @@ from typing import List, Optional
 from app.calculation import Calculation
 from app.exceptions import FileProcessingError
 from app import config
-
+from abc import ABC, abstractmethod
 # Define HistoryObserver interface to avoid circular import
-class HistoryObserver:
+class HistoryObserver(ABC):
+    @abstractmethod
     def update(self, calculation: Calculation) -> None:
-        """
-        Called when the history changes; to be implemented by subclasses.
-        """
-        raise NotImplementedError
+        pass
 
 class AutoSaveObserver(HistoryObserver):
     def __init__(self, history: List[Calculation], output_file: Optional[str] = None):
