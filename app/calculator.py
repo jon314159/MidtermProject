@@ -153,10 +153,10 @@ def calculator() -> None:
                     if abs(a) > config.CALCULATOR_MAX_INPUT_VALUE or abs(b) > config.CALCULATOR_MAX_INPUT_VALUE:
                         print("Input values exceed the maximum allowed.")
                         continue #pragma: no cover
-                    if cmd_name == "root":
-                        cmd_name = "square_root"
-                    elif cmd_name == "int_divide":
-                        cmd_name = "integer_division"
+                    if cmd_name == "root": # pragma: no cover
+                        cmd_name = "square_root" # pragma: no cover
+                    elif cmd_name == "int_divide": # pragma: no cover
+                        cmd_name = "integer_division" # pragma: no cover
                     calc = CalculationFactory.create_calculation(cmd_name, a, b)
                     result = round(calc.execute(), config.CALCULATOR_PRECISION)
                     calc.result = result

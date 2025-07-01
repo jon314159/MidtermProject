@@ -97,3 +97,21 @@ def test_unknown_command(mock_exit, mock_input, capsys):
         calculator()
     output = capsys.readouterr().out
     assert "Unknown command" in output
+
+# --------- Test Undo Command ---------
+@patch("builtins.input", side_effect=["add 1 2", "undo", "exit"])
+@patch("sys.exit", side_effect=SystemExit)
+def test_undo_command(mock_exit, mock_input, capsys):
+    with pytest.raises(SystemExit):
+        calculator()
+    output = capsys.readouterr().out
+    assert "Undid last operation." in output
+
+# --------- Test Redo Command ---------
+@patch("builtins.input", side_effect=["add 1 2", "undo", "redo", "exit"])
+@patch("sys.exit", side_effect=SystemExit)
+def test_redo_command(mock_exit, mock_input, capsys):
+    with pytest.raises(SystemExit):
+        calculator()
+    output = capsys.readouterr().out
+    assert "Redid operation." in output
