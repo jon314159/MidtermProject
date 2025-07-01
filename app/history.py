@@ -5,6 +5,7 @@ from app.calculation import Calculation
 from app.exceptions import FileProcessingError
 from app import config
 from abc import ABC, abstractmethod
+from typing import Sequence
 # Define HistoryObserver interface to avoid circular import
 class HistoryObserver(ABC):
     @abstractmethod
@@ -12,7 +13,7 @@ class HistoryObserver(ABC):
         pass
 
 class AutoSaveObserver(HistoryObserver):
-    def __init__(self, history: List[Calculation], output_file: Optional[str] = None):
+    def __init__(self, history: Sequence[Calculation], output_file: Optional[str] = None):
         self.history = history
 
         # Resolve default output file path
