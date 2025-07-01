@@ -22,10 +22,6 @@ class DummyCalculation(Calculation):
             raise ValueError("Result is not set")
         return self.result
 
-class DummyObserver(HistoryObserver):
-    def update(self, calculation: Calculation) -> None:
-        raise NotImplementedError("This is a dummy observer")
-
 # -----------------------
 # HistoryObserver Tests
 # -----------------------

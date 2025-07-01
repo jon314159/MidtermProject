@@ -10,7 +10,7 @@ from typing import Sequence
 class HistoryObserver(ABC):
     @abstractmethod
     def update(self, calculation: Calculation) -> None:
-        pass
+        pass #pragma: no cover
 
 class AutoSaveObserver(HistoryObserver):
     def __init__(self, history: Sequence[Calculation], output_file: Optional[str] = None):

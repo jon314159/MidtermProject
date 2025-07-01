@@ -1,6 +1,6 @@
 # Command-Line Calculator
 
-A fully interactive command-line calculator built in Python. This tool uses design patterns (Factory, Observer, Memento) and features a Read-Eval-Print Loop (REPL) interface with undo/redo, history persistence, and configurable settings via environment variables.
+Not perfect but my best attempt at a fully interactive command-line calculator built in Python. This tool uses design patterns (Factory, Observer, Memento) and features a Read-Eval-Print Loop (REPL) interface with undo/redo, history persistence, and configurable settings via environment variables.
 
 ---
 
@@ -114,7 +114,7 @@ You may configure logging in logger.py for info/warning/error levels.
 
 MIT License
 
-Copyright (c) 2025 [Jonathan Capalbo]
+Copyright (c) 2025 Jonathan Capalbo
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
