@@ -109,6 +109,7 @@ A basic workflow is included in .github/workflows/python-app.yml:
 
 Ensure the logs folder exists or set CALCULATOR_LOG_DIR=logs in your .env.
 You may configure logging in logger.py for info/warning/error levels.
+
 📄 License
 
 MIT License

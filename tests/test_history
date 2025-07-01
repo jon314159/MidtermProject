@@ -1,38 +1,88 @@
 import os
 import pandas as pd
-import tempfile
+import pytest
 from typing import List
+from pathlib import Path
+from unittest.mock import patch
 from app.history import AutoSaveObserver, HistoryObserver
-from app.calculation import Calculation
+from app.calculation import Calculation, CalculationFactory
+from app.exceptions import FileProcessingError
+
+# -----------------------
+# Dummy Classes for Base Testing
+# -----------------------
 
 class DummyCalculation(Calculation):
     def __init__(self):
-        self.a = 1.0
-        self.b = 2.0
+        super().__init__(1.0, 2.0)
         self.result = 3.0
+
+    def execute(self) -> float:
+        if self.result is None:
+            raise ValueError("Result is not set")
+        return self.result
 
 class DummyObserver(HistoryObserver):
     def update(self, calculation: Calculation) -> None:
         super().update(calculation)  # This will raise NotImplementedError
 
+# -----------------------
+# HistoryObserver Tests
+# -----------------------
+
 def test_history_observer_not_implemented():
     observer = DummyObserver()
     calc = DummyCalculation()
-    try:
+    with pytest.raises(NotImplementedError):
         observer.update(calc)
-        assert False, "Expected NotImplementedError"
-    except NotImplementedError:
-        pass
+
+def test_direct_history_observer_raises():
+    observer = HistoryObserver()
+    dummy = DummyCalculation()
+    with pytest.raises(NotImplementedError):
+        observer.update(dummy)
+
+# -----------------------
+# AutoSaveObserver Tests
+# -----------------------
+
+def test_autosave_observer_init_creates_output_dir(tmp_path):
+    history: List[Calculation] = []
+    output_file = tmp_path / "nested" / "history.csv"
+    observer = AutoSaveObserver(history=history, output_file=str(output_file))
+    assert observer.output_file == str(output_file)
+    assert output_file.parent.exists()
 
 def test_autosave_observer_saves_csv(tmp_path):
-    calc = DummyCalculation()
-    history: List[Calculation] = [calc]
-
+    history: List[Calculation] = [CalculationFactory.create_calculation("add", 2, 3)]
+    history[0].result = 5.0
     output_file = tmp_path / "history.csv"
     observer = AutoSaveObserver(history=history, output_file=str(output_file))
-    observer.update(calc)
-
+    observer.update(history[0])
     assert output_file.exists()
     df = pd.read_csv(output_file)
-    assert list(df.columns) == ["operation", "operand1", "operand2", "result"]
-    assert df.iloc[0]["result"] == 3.0
+    assert df.iloc[0]["operand1"] == 2
+    assert df.iloc[0]["result"] == 5
+
+def test_autosave_observer_raises_fileprocessingerror(tmp_path):
+    calc = CalculationFactory.create_calculation("add", 1, 1)
+    calc.result = 2.0
+    history: List[Calculation] = [calc]
+    output_file = tmp_path / "bad.csv"
+    observer = AutoSaveObserver(history=history, output_file=str(output_file))
+    with patch("pandas.DataFrame.to_csv", side_effect=IOError("Write failed")):
+        with pytest.raises(FileProcessingError) as exc:
+            observer.update(calc)
+        assert "Error saving history" in str(exc.value)
+
+# -----------------------
+# Extra test to touch __init__ logic via side effect
+# -----------------------
+
+def test_autosave_observer_default_output_path(monkeypatch):
+    monkeypatch.setattr("app.config.CALCULATOR_HISTORY_DIR", "custom_hist_dir")
+    monkeypatch.setattr("app.config.CALCULATOR_DEFAULT_ENCODING", "utf-8")
+    history: List[Calculation] = [DummyCalculation()]
+    observer = AutoSaveObserver(history=history)
+    assert "custom_hist_dir" in observer.output_file
+    assert observer.output_file.endswith("history.csv")

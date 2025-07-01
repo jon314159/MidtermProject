@@ -18,6 +18,9 @@ from app.calculator_memento import MementoManager
 import app.calculation_operations  # Ensures all @register_calculation decorators run
 import app.config as config
 
+os.makedirs(config.CALCULATOR_HISTORY_DIR, exist_ok=True)
+
+
 def display_help():
     """
     Display the help message for the calculator.

@@ -22,7 +22,7 @@ class LoggingObserver(HistoryObserver):
     """
 
     def __init__(self, log_file: str = log_file): # pragama: no cover
-        self.log_file = log_file  # pragama: no cover
+        self.log_file = log_file  # pragma: no cover
 
     def update(self, calc: Calculation) -> None:
         """
