@@ -1,36 +1,30 @@
 import os
 import pandas as pd
-from typing import List
+from typing import List, Optional
 from app.calculation import Calculation
-from typing import Optional
 from app.exceptions import FileProcessingError
-# define HistoryObserver interface to avoid circular import
+from app import config
+
+# Define HistoryObserver interface to avoid circular import
 class HistoryObserver:
     def update(self, calculation: Calculation) -> None:
         """
         Called when the history changes; to be implemented by subclasses.
         """
         raise NotImplementedError
-from app import config
 
 class AutoSaveObserver(HistoryObserver):
-    """
-    Automatically saves the list of calculations to a CSV file whenever an update is triggered.
-    """
-
     def __init__(self, history: List[Calculation], output_file: Optional[str] = None):
-        """
-        Initialize the observer with the history list and optional output file path.
-
-        :param history: List of performed Calculation objects.
-        :param output_file: Optional override for the CSV file path.
-        """
         self.history = history
-        self.output_file = output_file or os.path.join(config.CALCULATOR_HISTORY_DIR, "history.csv")
 
-        # Ensure the output directory exists to prevent FileNotFoundError
-        os.makedirs(os.path.dirname(self.output_file), exist_ok=True)
+        # Resolve default output file path
+        history_dir = config.CALCULATOR_HISTORY_DIR or "history"
+        self.output_file = output_file or os.path.join(history_dir, "history.csv")
 
+        # ✅ Fix: force directory creation even if history_dir is "history"
+        output_dir = os.path.dirname(self.output_file)
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
     def update(self, _: Calculation) -> None:
         """
         Save the full calculation history to a CSV file.
@@ -42,8 +36,9 @@ class AutoSaveObserver(HistoryObserver):
                 "operation": c.__class__.__name__,
                 "operand1": c.a,
                 "operand2": c.b,
-                "result": c.result
-                } for c in self.history]
+                "result": getattr(c, "result", None)  # Use getattr to avoid crash if unset
+            } for c in self.history]
+
             df = pd.DataFrame(data)
             df.to_csv(self.output_file, index=False, encoding=config.CALCULATOR_DEFAULT_ENCODING)
         except Exception as e:
